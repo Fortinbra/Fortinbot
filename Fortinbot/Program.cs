@@ -1,22 +1,16 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Fortinbot.Handlers;
 using Fortinbot.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Fortinbot
 {
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:Elements should be documented", Justification = "Program Entry point")]
 	internal class Program
 	{
-		private static DiscordSocketClient _client;
-
-		//public static void Main(string[] args) => new Program().MainAsync().GetAwaiter().GetResult();
-
 		public static void Main(string[] args)
 		{
 			CreateHostBuilder(args).Build().Run();
@@ -26,33 +20,18 @@ namespace Fortinbot
 			Host.CreateDefaultBuilder(args)
 			.ConfigureServices((hostcontext, services) =>
 			{
-				services.AddScoped<DiscordSocketClient>(async _ =>
+				services.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
 				{
-					_client = new DiscordSocketClient();
+					LogLevel = LogSeverity.Verbose,
+					MessageCacheSize = 2048,
+				}));
+				services.AddSingleton<CommandHandler>();
+				services.AddSingleton<StartupService>();
+				services.AddSingleton<LoggingService>();
+				services.AddSingleton<Random>();
 
-					await _client.LoginAsync(TokenType.Bot,
-					Environment.GetEnvironmentVariable("DiscordToken"));
-					await _client.StartAsync();
-					return _client;
-				});
 				services.AddHostedService<CountdownService>();
+
 			});
-
-		public async Task MainAsync()
-		{
-			_client = new DiscordSocketClient();
-			_client.Log += Log;
-			await _client.LoginAsync(TokenType.Bot,
-				Environment.GetEnvironmentVariable("DiscordToken"));
-			await _client.StartAsync();
-
-			// Block this task until the program is closed.
-			await Task.Delay(-1);
-		}
-		private Task Log(LogMessage msg)
-		{
-			Console.WriteLine(msg.ToString());
-			return Task.CompletedTask;
-		}
 	}
 }
