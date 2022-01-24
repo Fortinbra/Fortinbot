@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
 using Fortinbot.Handlers;
 using Fortinbot.Services;
@@ -25,12 +26,18 @@ namespace Fortinbot
 					LogLevel = LogSeverity.Verbose,
 					MessageCacheSize = 2048,
 				}));
+				services.AddSingleton(new CommandService(new CommandServiceConfig
+				{
+					LogLevel = LogSeverity.Verbose,
+					DefaultRunMode = RunMode.Async,
+				}));
 				services.AddSingleton<CommandHandler>();
 				services.AddSingleton<StartupService>();
 				services.AddSingleton<LoggingService>();
 				services.AddSingleton<Random>();
 
-				services.AddHostedService<CountdownService>();
+				services.AddHostedService<StartupService>();
+				//services.AddHostedService<CountdownService>();
 
 			});
 	}

@@ -7,7 +7,7 @@ namespace Fortinbot.Services
 	public class CountdownService : IHostedService, IDisposable
 	{
 		private readonly ILogger _logger;
-		private System.Timers.Timer _timer;
+		private System.Timers.Timer? _timer;
 		private readonly CronExpression _cronExpression;
 		public CountdownService(ILogger<CountdownService> logger, IHostApplicationLifetime appLifetime)
 		{
